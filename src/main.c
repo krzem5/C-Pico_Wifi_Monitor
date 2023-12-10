@@ -54,7 +54,7 @@ static void _input_callback(unsigned char length,const char* data){
 	}
 	else if (length==1&&*data=='c'){
 		pico_usb_console_protocol_send_log(0,"%s (%x:%x:%x:%x:%x:%x)",(cyw43_wifi_link_status(&cyw43_state,CYW43_ITF_STA)==CYW43_LINK_JOIN?"connected":"not connected"),mac_address[0],mac_address[1],mac_address[2],mac_address[3],mac_address[4],mac_address[5]);
-		uint8_t buffer[]={
+		uint8_t buffer[18]={
 			0xff,0xff,0xff,0xff,0xff,0xff,
 			mac_address[0],mac_address[1],mac_address[2],mac_address[3],mac_address[4],mac_address[5],
 			'?','?',
