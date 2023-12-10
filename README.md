@@ -1,1 +1,1 @@
-# C - Pico Wifi Monitor
+# C - Pico WiFi Monitor

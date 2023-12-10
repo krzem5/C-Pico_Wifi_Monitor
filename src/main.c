@@ -8,8 +8,24 @@
 
 
 
+static uint8_t mac_address[6];
+
+
+
 void cyw43_cb_process_ethernet(void* cb_data,int itf,size_t len,const uint8_t* buf){
 	pico_usb_console_protocol_send_log(0,"Packet");
+}
+
+
+
+void cyw43_cb_tcpip_set_link_up(cyw43_t* self,int itf){
+	pico_usb_console_protocol_send_log(0,"Packet2");
+}
+
+
+
+void cyw43_cb_tcpip_set_link_down(cyw43_t* self,int itf){
+	pico_usb_console_protocol_send_log(0,"Packet3");
 }
 
 
@@ -31,7 +47,10 @@ static void _input_callback(unsigned char length,const char* data){
 		}
 	}
 	else if (length==1&&*data=='c'){
-		pico_usb_console_protocol_send_log(0,"%u",(cyw43_wifi_link_status(&cyw43_state,CYW43_ITF_STA)==CYW43_LINK_JOIN?"connected":"not connected"));
+		pico_usb_console_protocol_send_log(0,"%s (%x:%x:%x:%x:%x:%x)",(cyw43_wifi_link_status(&cyw43_state,CYW43_ITF_STA)==CYW43_LINK_JOIN?"connected":"not connected"),mac_address[0],mac_address[1],mac_address[2],mac_address[3],mac_address[4],mac_address[5]);
+	}
+	else if (length==1&&*data=='d'){
+		cyw43_arch_wifi_connect_async(WIFI_SSID,WIFI_PASSWORD,CYW43_AUTH_WPA2_AES_PSK);
 	}
 	else if (length==1&&*data=='q'){
 		reset_usb_boot(0,0);
@@ -41,17 +60,18 @@ static void _input_callback(unsigned char length,const char* data){
 
 
 int main(void){
-	cyw43_arch_init();
+	cyw43_arch_init_with_country(CYW43_COUNTRY_LUXEMBOURG);
     cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN,1);
     cyw43_arch_enable_sta_mode();
+	cyw43_wifi_pm(&cyw43_state,CYW43_PERFORMANCE_PM);
+    cyw43_hal_get_mac(0,mac_address);
 	pico_usb_console_init();
 	pico_usb_console_protocol_set_input_callback(_input_callback);
 	watchdog_enable(500,0);
-	cyw43_arch_wifi_connect_async(WIFI_SSID,WIFI_PASSWORD,CYW43_AUTH_WPA2_AES_PSK);
 	while (1){
 		pico_usb_console_update();
 		pico_usb_console_protocol_update();
-		cyw43_arch_poll();
+		cyw43_poll();
 		watchdog_update();
 	}
 	reset_usb_boot(0,0);
