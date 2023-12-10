@@ -54,8 +54,13 @@ static void _input_callback(unsigned char length,const char* data){
 	}
 	else if (length==1&&*data=='c'){
 		pico_usb_console_protocol_send_log(0,"%s (%x:%x:%x:%x:%x:%x)",(cyw43_wifi_link_status(&cyw43_state,CYW43_ITF_STA)==CYW43_LINK_JOIN?"connected":"not connected"),mac_address[0],mac_address[1],mac_address[2],mac_address[3],mac_address[4],mac_address[5]);
-		char buffer[]={'A','B','C','D','E'};
-		cyw43_send_ethernet(&cyw43_state,CYW43_ITF_STA,5,buffer,0);
+		uint8_t buffer[]={
+			0xff,0xff,0xff,0xff,0xff,0xff,
+			mac_address[0],mac_address[1],mac_address[2],mac_address[3],mac_address[4],mac_address[5],
+			'?','?',
+			'D','a','t','a'
+		};
+		cyw43_send_ethernet(&cyw43_state,CYW43_ITF_STA,sizeof(buffer),buffer,0);
 	}
 	else if (length==1&&*data=='d'){
 		cyw43_arch_wifi_connect_async(WIFI_SSID,WIFI_PASSWORD,CYW43_AUTH_WPA2_AES_PSK);
