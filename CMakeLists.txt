@@ -7,7 +7,7 @@ project(wifi_monitor LANGUAGES C CXX)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 pico_sdk_init()
-add_compile_options(-Wall -Wno-format -Werror -O3 -g0 -fdata-sections -ffunction-sections -Wl,--gc-sections -DCYW43_LWIP=0)
+add_compile_options(-Wall -Wno-format -Werror -O3 -g0 -fdata-sections -ffunction-sections -Wl,--gc-sections -DCYW43_LWIP=0 -DNDEBUG)
 include_directories(src/include)
 include_directories(src/include/pico_usb_console/config)
 add_executable(wifi_monitor

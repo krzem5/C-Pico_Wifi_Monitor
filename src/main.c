@@ -63,7 +63,7 @@ static void _input_callback(unsigned char length,const char* data){
 		cyw43_send_ethernet(&cyw43_state,CYW43_ITF_STA,sizeof(buffer),buffer,0);
 	}
 	else if (length==1&&*data=='d'){
-		cyw43_arch_wifi_connect_async(WIFI_SSID,WIFI_PASSWORD,CYW43_AUTH_WPA2_AES_PSK);
+		cyw43_arch_wifi_connect_bssid_async(WIFI_SSID,WIFI_BSSID,WIFI_PASSWORD,CYW43_AUTH_WPA2_AES_PSK);
 	}
 	else if (length==1&&*data=='q'){
 		reset_usb_boot(0,0);
@@ -80,12 +80,13 @@ int main(void){
     cyw43_hal_get_mac(0,mac_address);
 	pico_usb_console_init();
 	pico_usb_console_protocol_set_input_callback(_input_callback);
-	// watchdog_enable(500,0);
+	watchdog_enable(500,0);
+	cyw43_arch_wifi_connect_bssid_async(WIFI_SSID,WIFI_BSSID,WIFI_PASSWORD,CYW43_AUTH_WPA2_AES_PSK);
 	while (1){
 		pico_usb_console_update();
 		pico_usb_console_protocol_update();
 		cyw43_poll();
-		// watchdog_update();
+		watchdog_update();
 	}
 	reset_usb_boot(0,0);
 }
